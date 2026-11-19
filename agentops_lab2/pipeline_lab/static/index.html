@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta charset="utf-8">
+ <title>Agent Pipeline</title>
+ <style>
+ body { font-family: Arial, sans-serif; max-width: 640px;
+ margin: 40px auto; }
+ input { width: 70%; padding: 6px; }
+ button { padding: 6px 14px; }
+ #result, #services { margin-top: 20px; padding: 12px;
+ background: #f3f3f3; white-space: pre-wrap; }
+ </style>
+</head>
+<body>
+ <h2>Researcher &rarr; Writer &rarr; Reviewer</h2>
+ <input id="topic" value="docker"
+ placeholder="docker, langgraph, fastapi or agentops">
+ <button onclick="runPipeline()">Run pipeline</button>
+ <button onclick="checkServices()">Check services</button>
+ <div id="result">Result appears here.</div>
+ <div id="services">Service status appears here.</div>
+ <script>
+ async function runPipeline() {
+ const box = document.getElementById("result");
+ box.textContent = "Running the pipeline...";
+ try {
+ const response = await fetch("/pipeline", {
+ method: "POST",
+ headers: { "Content-Type": "application/json" },
+ body: JSON.stringify({
+ topic: document.getElementById("topic").value
+ })
+ });
+ const d = await response.json();
+ box.textContent =
+ "Status: " + d.status.toUpperCase()
+ + "\n\n" + (d.article || "(no article)")
+ + "\n\nReviewer: " + (d.verdict || "(none)")
+ + "\nRevisions: " + d.revisions
+ + " Retries: " + d.retries
+ + " Latency: " + d.latency_ms + " ms"
+ + "\nStudent: " + d.student
+ + (d.failed_stage ? "\nFailed stage: " + d.failed_stage
+ + " (" + d.reason + ")" : "");
+ } catch (err) {
+ box.textContent = "Could not reach the orchestrator: " + err;
+ }
+ }
+
+ async function checkServices() {
+ const box = document.getElementById("services");
+ try {
+ const r = await fetch("/services");
+ const d = await r.json();
+ box.textContent = Object.entries(d)
+ .map(([n, i]) => n + ": " + (i.up ? "UP, " + i.uptime_s
+ + " s" : "DOWN"))
+ .join("\n");
+ } catch (err) {
+ box.textContent = "Could not reach the orchestrator: " + err;
+ }
+ }
+ </script>
+</body>
+</html>

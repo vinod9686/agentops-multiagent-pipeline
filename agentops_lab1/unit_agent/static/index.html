@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta charset="utf-8">
+ <title>Unit Converter Agent</title>
+ <style>
+ body { font-family: Arial, sans-serif; max-width: 640px;
+ margin: 40px auto; }
+ textarea { width: 100%; height: 80px; }
+ button { margin-top: 8px; padding: 8px 16px; }
+ #result { margin-top: 20px; padding: 12px; background: #f3f3f3;
+ white-space: pre-wrap; }
+ </style>
+</head>
+<body>
+ <h2>Unit Converter Agent</h2>
+ <textarea id="task" placeholder="e.g. Convert 42 km to miles"></textarea>
+ <br>
+ <button onclick="runAgent()">Ask the agent</button>
+ <div id="result"></div>
+ <script>
+ async function runAgent() {
+ const box = document.getElementById("result");
+ const task = document.getElementById("task").value;
+ box.textContent = "Thinking...";
+ try {
+ const response = await fetch("/run", {
+ method: "POST",
+ headers: { "Content-Type": "application/json" },
+ body: JSON.stringify({ task: task })
+ });
+ const data = await response.json();
+ if (!response.ok) {
+ box.textContent = "Error: " + data.detail;
+ return;
+ }
+ const used = data.tools_used.length
+ ? data.tools_used.join(", ") : "none";
+ box.textContent = data.answer
+ + "\n\nTools used: " + used
+ + "\nLatency: " + data.latency_ms + " ms";
+ } catch (err) {
+ box.textContent = "Could not reach the agent: " + err;
+ }
+ }
+ </script>
+</body>
+</html>

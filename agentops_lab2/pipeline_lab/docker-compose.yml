@@ -1,0 +1,57 @@
+# Settings shared by all four services (YAML anchor, reused below)
+x-common: &common
+  image: agentops-lab2:pes1ug25am817
+  env_file: .env
+  restart: unless-stopped
+  healthcheck:
+    test: ["CMD", "python", "healthcheck.py"]
+    interval: 10s
+    timeout: 3s
+    retries: 3
+    start_period: 10s
+
+services:
+  researcher:
+    <<: *common
+    build: .
+    environment:
+      ROLE: researcher
+
+  writer:
+    <<: *common
+    environment:
+      ROLE: writer
+      FAIL_RATE: ${WRITER_FAIL_RATE:-0}
+
+  reviewer:
+    <<: *common
+    environment:
+      ROLE: reviewer
+      FAIL_RATE: ${REVIEWER_FAIL_RATE:-0}
+      DELAY_MS: ${REVIEWER_DELAY_MS:-0}
+
+  orchestrator:
+    <<: *common
+    command:
+      - uvicorn
+      - orchestrator:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+    environment:
+      RESEARCHER_URL: http://researcher:8000
+      WRITER_URL: http://writer:8000
+      REVIEWER_URL: http://reviewer:8000
+      LOG_FILE: /logs/events.jsonl
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./logs:/logs
+    depends_on:
+      researcher:
+        condition: service_healthy
+      writer:
+        condition: service_healthy
+      reviewer:
+        condition: service_healthy

@@ -1,0 +1,57 @@
+
+--- RESULTS FOR MAX_RETRIES = 0 ---
+=== Pipeline metrics (20 runs) - PES1UG25AM817 ===
+Task success rate      : 35.0 % (approved 7 of 20)
+  rejected by reviewer : 1
+  failed (service error): 12
+  degraded (unreviewed): 0
+Average run latency    : 39 ms
+95th percentile latency: 78 ms
+Retry rate             : 0.0 % (0 retries / 50 stage calls)
+Average revisions/run  : 0.05
+--- Average successful call latency per stage ---
+  researcher : 9 ms (20 calls)
+  writer     : 7 ms (9 calls)
+  reviewer   : 10 ms (9 calls)
+--- Container uptime (from /services) ---
+  researcher : UP 0 min 15 s
+  writer     : UP 0 min 15 s
+  reviewer   : UP 0 min 14 s
+
+--- RESULTS FOR MAX_RETRIES = 1 ---
+=== Pipeline metrics (20 runs) - PES1UG25AM817 ===
+Task success rate      : 60.0 % (approved 12 of 20)
+  rejected by reviewer : 2
+  failed (service error): 6
+  degraded (unreviewed): 0
+Average run latency    : 418 ms
+95th percentile latency: 772 ms
+Retry rate             : 24.1 % (14 retries / 58 stage calls)
+Average revisions/run  : 0.10
+--- Average successful call latency per stage ---
+  researcher : 8 ms (20 calls)
+  writer     : 7 ms (16 calls)
+  reviewer   : 9 ms (16 calls)
+--- Container uptime (from /services) ---
+  researcher : UP 0 min 22 s
+  writer     : UP 0 min 22 s
+  reviewer   : UP 0 min 22 s
+
+--- RESULTS FOR MAX_RETRIES = 3 ---
+=== Pipeline metrics (20 runs) - PES1UG25AM817 ===
+Task success rate      : 90.0 % (approved 18 of 20)
+  rejected by reviewer : 2
+  failed (service error): 0
+  degraded (unreviewed): 0
+Average run latency    : 287 ms
+95th percentile latency: 787 ms
+Retry rate             : 10.9 % (7 retries / 64 stage calls)
+Average revisions/run  : 0.10
+--- Average successful call latency per stage ---
+  researcher : 8 ms (20 calls)
+  writer     : 5 ms (22 calls)
+  reviewer   : 7 ms (22 calls)
+--- Container uptime (from /services) ---
+  researcher : UP 0 min 19 s
+  writer     : UP 0 min 19 s
+  reviewer   : UP 0 min 19 s

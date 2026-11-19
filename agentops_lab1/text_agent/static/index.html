@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta charset="utf-8">
+ <title>Text Helper Agent</title>
+ <style>
+ body { font-family: Arial, sans-serif; max-width: 640px;
+ margin: 40px auto; }
+ textarea { width: 100%; height: 120px; }
+ button { margin-top: 8px; padding: 8px 16px; }
+ #who { color: #555; }
+ #result { margin-top: 20px; padding: 12px; background: #f3f3f3;
+ white-space: pre-wrap; }
+ </style>
+</head>
+<body>
+ <h2>Text Helper Agent</h2>
+ <p id="who">Loading student details...</p>
+ <textarea id="task"
+ placeholder="Paste some text for the agent to analyze"></textarea>
+ <br>
+ <button onclick="runAgent()">Analyze</button>
+ <div id="result"></div>
+ <script>
+ // NEW: show whose service this is, using /health
+ fetch("/health")
+ .then(r => r.json())
+ .then(d => {
+ document.getElementById("who").textContent =
+ "Student: " + d.student + " | Model: " + d.model;
+ });
+
+ async function runAgent() {
+ const box = document.getElementById("result");
+ const task = document.getElementById("task").value;
+ box.textContent = "Thinking...";
+ try {
+ const response = await fetch("/run", {
+ method: "POST",
+ headers: { "Content-Type": "application/json" },
+ body: JSON.stringify({ task: task })
+ });
+ const data = await response.json();
+ if (!response.ok) {
+ box.textContent = "Error: " + data.detail;
+ return;
+ }
+ const used = data.tools_used.length
+ ? data.tools_used.join(", ") : "none";
+ box.textContent = data.answer
+ + "\n\nTools used: " + used
+ + "\nLatency: " + data.latency_ms + " ms"
+ + "\nStudent: " + data.student;
+ } catch (err) {
+ box.textContent = "Could not reach the agent: " + err;
+ }
+ }
+ </script>
+</body>
+</html>
